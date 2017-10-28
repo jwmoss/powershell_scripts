@@ -9,6 +9,7 @@
   Author:         Jonathan Moss
   Creation Date:  9/16/17
   Purpose/Change: Initial script development
+  Requires Powershell Core
 .EXAMPLE
   .\Get-Hardware.ps1
 #>
