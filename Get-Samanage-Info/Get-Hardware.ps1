@@ -14,7 +14,7 @@
   .\Get-Hardware.ps1
 #>
 
-## Define variables. Fill in the API key in line 20 after Bearer
+## Define variables. Fill in the API key in line 21 after Bearer
 $apiRoot = "https://api.samanage.com"
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 $headers.Add("Accept", 'application/vnd.samanage.v2.1+json')
