@@ -22,7 +22,7 @@ $contentType = "application/json"
 $data = Invoke-WebRequest -Uri "$apiRoot/hardwares.json" -Header $headers -ContentType $contentType -Method Get
 
 ## Gets the last page of the JSON output since Samanage limits their pages to 100 rows
-$lastpage = $($data.RelationLink | Select-Object Values | foreach { $_.Values} | Select-Object -Last 1) -replace '(.*)='
+$lastpage = $($data.RelationLink | Select-Object Values | ForEach-Object { $_.Values} | Select-Object -Last 1) -replace '(.*)='
 
 ## Loops through pages 1 through whatever the last page is and retrives the JSON information for hardware
 (1..($lastpage)) | ForEach-Object {
