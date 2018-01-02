@@ -5,7 +5,6 @@
   In order to install Remote Server Administration Tools, this script will download from Microsoft's website, check the OS to see if it's
   running on a Server OS or Windows 10, and if it's running Windows 10, it will try and download the latest version of RSAT. 
   Original script from https://blogs.technet.microsoft.com/drew/2016/12/23/installing-remote-server-admin-tools-rsat-via-powershell/
-
 .NOTES
   Version:        1.0
   Author:         Jonathan Moss
@@ -57,8 +56,6 @@ Write-host "Creating temporary folder to configure DNS for Windows 10 v1709" -fo
 $1ex = New-Item $Temp\ex1 -ItemType Directory
 
 Write-host "Expanding $DLPath" -foregroundcolor yellow
-
-Start-Sleep -Seconds 5
 
 expand.exe -f:* $DLPath $1ex
 
