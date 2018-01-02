@@ -13,12 +13,14 @@
   Purpose/Change: Initial script upload
   Requires Run As Administrator
 .EXAMPLE
-  .\Get-Hardware.ps1
+  .\Install-RSAT.ps1
 #>
 
 $web = Invoke-WebRequest https://www.microsoft.com/en-us/download/confirmation.aspx?id=45520 -UseBasicParsing
 
 $MachineOS = (Get-WmiObject Win32_OperatingSystem).Name
+
+$Windows10version = (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name ReleaseID).ReleaseID
 
 #Check for Windows Server 2012 R2
 IF ($MachineOS -like "*Microsoft Windows Server*") {
@@ -27,13 +29,13 @@ IF ($MachineOS -like "*Microsoft Windows Server*") {
     Break
 }
 
-IF ($ENV:PROCESSOR_ARCHITECTURE -eq "AMD64") {
-    Write-host "x64 Detected" -foregroundcolor yellow
+IF ($Windows10version -eq "1709" -and $ENV:PROCESSOR_ARCHITECTURE -eq "AMD64") {
+    Write-host "A 64-bit install is detected, proceeding!" -foregroundcolor yellow
     $Link = ($web.Links.href | Where-Object {$PSitem -like "*RSAT*" -and $PSitem -like "*x64*" -and $PSitem -notlike "*2016*"} | Select-Object -First 1) 
 }
 ELSE {
-    Write-host "x86 Detected" -forgroundcolor yellow
-    $Link = ($web.Links.href | Where-Object {$PSitem -like "*RSAT*" -and $PSitem -like "*x86*" -and $PSitem -notlike "*2016*"} | Select-Object -First 1) 
+    Write-host "Not running 64-bit or an incorrect Windows 10 version. The version of Windows is $Windows10version" -forgroundcolor red
+    Break
 }
 
 $DLPath = ($ENV:TEMP) + ($link.split("/")[8])
