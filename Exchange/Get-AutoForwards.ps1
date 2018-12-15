@@ -7,7 +7,7 @@
     Opens a powershell remoting session to the exchange server, exports info to CSV, and sends an email.
 #>
 
-function Get-RemoteExchSession ($domain) {
+function Get-RemoteExchSession ($domain = "contoso.com") {
     Write-Host "Beginning to setup remoting session to Exchange server" -ForegroundColor Gray 
     $ExchangeParams = @{
         ConfigurationName = "Microsoft.Exchange"
@@ -18,7 +18,7 @@ function Get-RemoteExchSession ($domain) {
     return $ExchangeSession
 }
 
-$session = Get-RemoteExchSession -domain "contoso.com"
+$session = Get-RemoteExchSession
 
 Import-PSSession $session
 
