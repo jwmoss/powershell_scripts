@@ -1,0 +1,84 @@
+{
+    "builders": [
+        {
+            "type": "vsphere-iso",
+            "vcenter_server": "vCenter.fqdn.com",
+            "username": "domain\\user",
+            "password": "{{ user `password` }}",
+            "insecure_connection": "true",
+            "vm_version": 13,
+            "vm_name": "Template_Win2016_Std_64bit_Prod",
+            "guest_os_type": "windows9Server64Guest",
+            "communicator": "winrm",
+            "cluster": "cluster1",
+            "datacenter": "datacenter1",
+            "host": "esxihost.fqdn.com",
+            "datastore": "datastore1",
+            "network": "Virtual Switch 1",
+            "winrm_username": "admin",
+            "winrm_password": "{{ user `winrm_password` }}",
+            "winrm_port": 5985,
+            "CPUs": 2,
+            "RAM": 4096,
+            "convert_to_template": "true",
+            "CPU_limit": -1,
+            "boot_order": "disk,cdrom",
+            "RAM_reserve_all": true,
+            "disk_controller_type": "pvscsi",
+            "disk_size": 71680,
+            "disk_thin_provisioned": true,
+            "network_card": "vmxnet3",
+            "iso_paths": [
+                "[datastore1] ISO/14393.0.161119-1705.RS1_REFRESH_SERVER_EVAL_X64FRE_EN-US.ISO",
+                "[datastore1] ISO/Windows.iso"
+            ],
+            "floppy_files": [
+                "./Setup/"
+            ],
+            "floppy_img_path": "[datastore1] ISO/pvscsi-Windows8.flp"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "powershell",
+            "elevated_user": "admin",
+            "elevated_password": "{{ user `winrm_password` }}",
+            "scripts": [
+                "./Scripts/Install-Chocolatey.ps1",
+                "./Scripts/Set-ChocolateySettings.ps1",
+                "./Scripts/Install-Boxstarter.ps1"
+
+            ]
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "15m"
+        },
+        {
+            "type": "powershell",
+            "elevated_user": "admin",
+            "elevated_password": "{{ user `winrm_password` }}",
+            "scripts": [
+                "./Scripts/Invoke-SystemUpdate.ps1"
+            ]
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "30m"
+        },
+        {
+            "type": "powershell",
+            "elevated_user": "admin",
+            "elevated_password": "{{ user `winrm_password` }}",
+            "scripts": [
+                "./Scripts/Invoke-SystemUpdate.ps1",
+                "./Scripts/Set-TimeZone.ps1",
+                "./Scripts/Invoke-SystemCleanup.ps1"
+            ]
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "45m"
+        }
+    ]
+}

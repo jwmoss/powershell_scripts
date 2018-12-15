@@ -1,0 +1,1 @@
+Install-WindowsUpdate -getUpdatesFromMS -acceptEula -SuppressReboots
