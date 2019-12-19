@@ -24,20 +24,20 @@ function Get-MailChimpContacts {
     
     process {
 
-        $lists = Invoke-RestMethod -URI $baseUri/3.0/lists?offset=0"&"count=100 -Method Get -Headers $Headers
+        $lists = Invoke-RestMethod -URI "$baseUri/3.0/lists?offset=0&count=100" -Method Get -Headers $Headers
     
         $listID = $lists.lists.id
     
         $existingMembers = $null
-        $existingmembers = Invoke-RestMethod -URI $baseUri/3.0/lists/$listId/members?offset=0"&"count=100 -Method Get -Headers $Headers
+        $existingmembers = Invoke-RestMethod -URI "$baseUri/3.0/lists/$listId/members?offset=0&count=100" -Method Get -Headers $Headers
         for ($i = 100; $i -le $existingMembers.total_items; $i += 100) {
-            $members = Invoke-RestMethod -URI $baseUri/3.0/lists/$listId/members?offset=$i"&"count=100 -Method Get -Headers $Headers
+            $members = Invoke-RestMethod -URI "$baseUri/3.0/lists/$listId/members?offset=$i&count=100" -Method Get -Headers $Headers
             $existingMembers.members += $members.members
         }
         
     }
     
     end {
-        return $existingMembers  
+        return $existingMembers
     }
 }
