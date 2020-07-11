@@ -17,12 +17,57 @@ if ($PSVersionTable.PSVersion.Major -lt 6) {
 }
 else {
     Import-Module PowerHTML -ErrorAction Stop
-    "powershell 7"
 
-    $page = iwr -Uri ($stock_url + "?t=$ticker")
+    $page = Invoke-WebRequest -Uri ($stock_url + "?t=$ticker")
 
     $rawhtml = ConvertFrom-Html $page.RawContent
 
-    $title = $rawhtml.where( { $_.HasClass("fullview-title") -eq "True" })
+    $title = ((($rawhtml.Descendants()).where{$_.HasClass("fullview-title") -eq "True" }).InnerText -split "`n")[1]
+    $titleData = ((($rawhtml.Descendants()).where{$_.HasClass("fullview-title") -eq "True" }).InnerText -split "`n")
+
+    $title = $titleData[2]
+    $title 
+    $Keys = @("Company","Sector","Industry","Country")
+
+    $fields = (($rawhtml.Descendants()).where{$_.HasClass("tab-link") -eq "True"})
+
+    $allrows = (($rawhtml.Descendants()).where{$_.HasClass("table-dark-row") -eq "True"})
+
+    $row1 = $allrows[0].InnerText -split "`n"
+
+    [PSCustomObject]@{
+        Title = $title
+        Company = $companyName
+        Index = $row1[1] -replace "Index"
+        PE = $row1[2] -replace "P\/E"
+        ## "EPS (ttm)" = $row1[3] -replace ""
+        "Perf Week" = $row1[6] -replace "Perf Week"
+    }
+
+}
+
+function Get-FVStock {
+    [CmdletBinding()]
+    param (
+        [string]
+        $Stock
+    )
+    
+    $stock_url = "https://finviz.com/quote.ashx"
+
+    Import-Module PowerHTML -ErrorAction Stop
+
+    $page = Invoke-WebRequest -Uri ($stock_url + "?t=$stock")
+
+    $rawhtml = ConvertFrom-Html $page.RawContent
+
+    $titleData = ((($rawhtml.Descendants()).where{$_.HasClass("fullview-title") -eq "True" }).InnerText -split "`n")
+
+    [PSCustomObject]@{
+        Company = $titleData[2]
+        Sector = $titleData[3].Split("|")[0]
+        Industry = $titleData[3].Split("|")[1].Trim()
+        Country = $titleData[3].Split("|")[2].Trim()
+    }
 
 }
