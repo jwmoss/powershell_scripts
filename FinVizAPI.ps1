@@ -33,15 +33,13 @@ else {
 
     $allrows = (($rawhtml.Descendants()).where{$_.HasClass("table-dark-row") -eq "True"})
 
-    $row1 = $allrows[0].InnerText -split "`n"
-
     [PSCustomObject]@{
-        Title = $title
-        Company = $companyName
-        Index = $row1[1] -replace "Index"
-        PE = $row1[2] -replace "P\/E"
-        ## "EPS (ttm)" = $row1[3] -replace ""
-        "Perf Week" = $row1[6] -replace "Perf Week"
+        Company = $titleData[2]
+        Index = ($allrows[0].InnerText -split "`n")[1] -replace "Index"
+        "P/E" = ($allrows[0].InnerText -split "`n")[2] -replace "P\/E"
+        "Perf Week" = ($allrows[0].InnerText -split "`n")[6] -replace "Perf Week"
+        "Perf Month" = ($allrows[1].InnerText -split "`n")[6] -replace "Perf Month"
+        "Shs Float" = ($allrows[1].InnerText -split "`n")[5] -replace "Shs Float"
     }
 
 }
