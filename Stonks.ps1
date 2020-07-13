@@ -40,7 +40,6 @@ function Get-FVVolume {
             $rawhtml = ConvertFrom-Html $page.RawContent
         
             $titleData = ((($rawhtml.Descendants()).where{ $_.HasClass("fullview-title") -eq "True" }).InnerText -split "`n")
-            $titleData
             $allrows = (($rawhtml.Descendants()).where{ $_.HasClass("table-dark-row") -eq "True" })
         
             $avg_volume = ($allrows[10].InnerText -split "`n")[5] -replace "Avg Volume"
