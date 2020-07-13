@@ -73,7 +73,6 @@ function Get-FVVolume {
                 $float_final = "{0:N0}" -f ([int]$float_volume_match * 1000000)
             }
         
-            Write-Host "$volume % $avg_volume_final"
             $rel_volume_final = "{0:P}" -f ($volume / $avg_volume_final)
             
             [PSCustomObject]@{
