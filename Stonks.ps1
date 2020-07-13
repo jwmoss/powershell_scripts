@@ -48,19 +48,15 @@ function Get-FVVolume {
             $volume = ($allrows[11].InnerText -split "`n")[5] -replace "Volume"
             $price = ($allrows[10].InnerText -split "`n")[6] -replace "Price"
             $float = ($allrows[1].InnerText -split "`n")[5] -replace "SHS Float"
-        
-            if ($null -eq $rel_volume) {
-                Write-host "Empty rel volume on stock $s"
-            }
+            
+            if ($rel_volume -match "M") {
+                $avg_volume_match = "{0:N}" -f ([int]($avg_volume -replace "M"))
+                $avg_volume_final = "{0:N0}" -f ([int]$avg_volume_match * 1000000)
+            } 
             else {
-                if ($rel_volume -match "M") {
-                    $avg_volume_match = "{0:N}" -f ([int]($avg_volume -replace "M"))
-                    $avg_volume_final = "{0:N0}" -f ([int]$avg_volume_match * 1000000)
-                } 
-                else {
-                    Write-host "$rel_volume doesn't match M?"
-                }
+                Write-host "$rel_volume doesn't match M?"
             }
+            
 
             if ($avg_volume -match "M") {
                 $avg_volume_match = "{0:N}" -f ([int]($avg_volume -replace "M"))
@@ -72,13 +68,8 @@ function Get-FVVolume {
                 $float_final = "{0:N0}" -f ([int]$float_volume_match * 1000000)
             }
         
-            if ($null -eq $avg_volume_final -and $null -eq $volume) {
-                $rel_volume_final = "{0:P}" -f ($volume / $avg_volume_final)
-            }
-            else {
-                $rel_volume_final = "{0:P}" -f ($volume / $avg_volume_final)
-            }
-        
+            $rel_volume_final = "{0:P}" -f ($volume / $avg_volume_final)
+            
             [PSCustomObject]@{
                 Company      = $titleData[2]
                 Price        = "{0:C}" -f $price
@@ -238,5 +229,5 @@ function Start-StonkWatch {
 }
 
 #Start-StonkWatch -Reddit WSB | Format-Table -AutoSize
-Start-StonkWatch -Reddit SSB | Format-Table -AutoSize
-#Start-StonkWatch -Reddit PS | Format-Table -AutoSize
+#Start-StonkWatch -Reddit SSB | Format-Table -AutoSize
+Start-StonkWatch -Reddit PS | Format-Table -AutoSize
