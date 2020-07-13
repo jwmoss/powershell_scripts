@@ -28,7 +28,14 @@ function Get-FVVolume {
     process {
         foreach ($s in $stock) {
             Write-Verbose "Processing $s"
-            $page = Invoke-WebRequest -Uri ($stock_url + "?t=$s")
+
+            try {
+                $page = Invoke-WebRequest -Uri ($stock_url + "?t=$s") -ErrorAction "stop"
+            }
+            catch {
+                Write-Warning "Couldnot find $s"
+                break
+            }
 
             $rawhtml = ConvertFrom-Html $page.RawContent
         
@@ -42,11 +49,19 @@ function Get-FVVolume {
             $price = ($allrows[10].InnerText -split "`n")[6] -replace "Price"
             $float = ($allrows[1].InnerText -split "`n")[5] -replace "SHS Float"
         
-            if ($rel_volume -match "M") {
-                $avg_volume_match = "{0:N}" -f ([int]($avg_volume -replace "M"))
-                $avg_volume_final = "{0:N0}" -f ([int]$avg_volume_match * 1000000)
+            if ($null -eq $rel_volume) {
+                Write-host "Empty rel volume on stock $s"
             }
-        
+            else {
+                if ($rel_volume -match "M") {
+                    $avg_volume_match = "{0:N}" -f ([int]($avg_volume -replace "M"))
+                    $avg_volume_final = "{0:N0}" -f ([int]$avg_volume_match * 1000000)
+                } 
+                else {
+                    Write-host "$rel_volume doesn't match M?"
+                }
+            }
+
             if ($avg_volume -match "M") {
                 $avg_volume_match = "{0:N}" -f ([int]($avg_volume -replace "M"))
                 $avg_volume_final = "{0:N0}" -f ([int]$avg_volume_match * 1000000)
@@ -57,7 +72,12 @@ function Get-FVVolume {
                 $float_final = "{0:N0}" -f ([int]$float_volume_match * 1000000)
             }
         
-            $rel_volume_final = "{0:P}" -f ($volume / $avg_volume_final)
+            if ($null -eq $avg_volume_final -and $null -eq $volume) {
+                $rel_volume_final = "{0:P}" -f ($volume / $avg_volume_final)
+            }
+            else {
+                $rel_volume_final = "{0:P}" -f ($volume / $avg_volume_final)
+            }
         
             [PSCustomObject]@{
                 Company      = $titleData[2]
@@ -66,8 +86,8 @@ function Get-FVVolume {
                 "Rel Volume" = $(New-Text $rel_volume_final -fg Cyan)
                 Volume       = $volume
                 Float        = $float_final
-                FinVizURL = "https://finviz.com/quote.ashx?t={0}&ty=c&ta=1&p=d" -f $s
-                RedditURL = $URL
+                FinVizURL    = "https://finviz.com/quote.ashx?t={0}&ty=c&ta=1&p=d" -f $s
+                RedditURL    = $URL
             }
         }
     } 
@@ -99,6 +119,9 @@ Function Get-PennyStockDD {
         elseif ($results_value -like "*$*") {
             $ticker = $results_value -replace "\$"
         }
+        elseif ($results_value -like "*$*" -and $results_value -like "*)*") {
+            $ticker = ($results_value -replace "\$") -replace ")"
+        }
         else {
             $ticker = $results_value
         }
@@ -112,46 +135,108 @@ Function Get-PennyStockDD {
     }
 }
 
-Function Get-PennyStockDD {
-    [alias("gpsdd")]
+Function Get-RedditDD {
+    [alias("grdd")]
     [CmdletBinding()]
     param (
-
+        [ValidateSet('PS', 'SSB', 'WSB')]
+        [string]
+        $Reddit
     )
 
-    $ps_dd = (Invoke-RestMethod "https://www.reddit.com/r/pennystocks/search/.json?sort=new&restrict_sr=on&q=flair%3ADD").data.children.data |
-    Where-Object { $_.Title -like "*$*" } | Sort-Object -Property Title 
-    $stockpattern = [regex]::new('[$][A-Za-z][\S]*')
 
-    foreach ($p in $ps_dd) {
-        $results = $p.title | Select-String $stockpattern -AllMatches
-        $url = $p.URL
-        $results_value = ($results.Matches.Value)
 
-        if ($results_value -like "*:*" -and $results_value -like "*$*") {
-            $ticker = ($results_value -replace ":") -replace "\$"
-        }
-        elseif ($results_value -like "*$*") {
-            $ticker = $results_value -replace "\$"
-        }
-        else {
-            $ticker = $results_value
-        }
+    Begin {
 
-        [PSCustomObject]@{
-            Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created))
-            Title = $p.title
-            Stock = $ticker
-            URL   = $url
-        }        
+        $stockpattern = [regex]::new("(?<Stock>[a-z]{1,4}|\d{1,3}(?=\.)|\d{4,})")
+    
+        switch ($Reddit) {
+            "PS" {  
+                $url = "https://www.reddit.com/r/pennystocks/search/.json?sort=new&restrict_sr=on&q=flair%3ADD"
+            }
+            "SSB" {
+                $url = "https://www.reddit.com/r/smallstreetbets/search/.json?sort=new&restrict_sr=on&q=flair%3AEpic%2BDD%2BAnalysis"
+            }
+            "WSB" {
+                $url = "https://www.reddit.com/r/wallstreetbets/search/.json?sort=new&restrict_sr=on&q=flair%3ADD"
+            }
+            Default {}
+        }
+    }
+
+    Process {
+
+        $ps_dd = (Invoke-RestMethod $url).data.children.data |
+        Where-Object { $_.Title -match $stockpattern } | Sort-Object -Property Title 
+
+        foreach ($p in $ps_dd) {
+            $results = $p.title | Select-String $stockpattern -AllMatches
+            $url = $p.URL
+            $results_value = ($results.Matches.Value)
+
+            if ($null -eq $results_value) {
+                Write-host "Could not find stock ticker in reddit Title $($p.title)"
+                Continue
+            }
+
+            if ($results_value -like "*:*" -and $results_value -like "*$*") {
+                $ticker = ($results_value -replace ":") -replace "\$"
+            }
+            elseif ($results_value -like "*$*") {
+                $ticker = $results_value -replace "\$"
+            }
+            else {
+                $ticker = $results_value
+            }
+
+            [PSCustomObject]@{
+                Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created))
+                Title = $p.title
+                Stock = $ticker
+                URL   = $url
+            }     
+        }   
+    }
+    End {
+
     }
 }
 
+function Start-StonkWatch {
+    [CmdletBinding()]
+    param (
+        [ValidateSet('PS', 'SSB', 'WSB')]
+        [string]
+        $Reddit
+    )
+    
+    begin {
+        
+    }
+    
+    process {
 
-Function Start-StonkWatch {
-    $results = Get-PennyStockDD
+        switch ($Reddit) {
+            "PS" { 
+                $results = Get-RedditDD -Reddit PS
+            }
+            "SSB" {
+                $results = Get-RedditDD -Reddit SSB
+            }
+            "WSB" {
+                $results = Get-RedditDD -Reddit WSB
+            }
+            Default {}
+        }
 
-    $results | Get-FVVolume | Sort-Object -Property "Rel Volume" -Descending 
+        $results | Get-FVVolume | Sort-Object -Property "Rel Volume" -Descending 
+    }
+    
+    end {
+        
+    }
 }
 
-Start-StonkWatch | Format-Table -AutoSize
+#Start-StonkWatch -Reddit WSB | Format-Table -AutoSize
+Start-StonkWatch -Reddit SSB | Format-Table -AutoSize
+#Start-StonkWatch -Reddit PS | Format-Table -AutoSize
