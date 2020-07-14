@@ -143,7 +143,7 @@ Function Get-PennyStockNew {
     $stockpattern = [regex]::new('[$][A-Za-z][\S]*')
     #$stockpattern = [regex]::new("^(([a-z]{2,4}):(?![a-z\\d]+\\.))?([a-z]{1,4}|\\d{1,3}(?=\\.)|\\d{4,})(\\.([a-z]{2}))?$")
 
-    foreach ($p in $ps_dd) {
+    $final = foreach ($p in $ps_dd) {
         $results = $p.title | Select-String $stockpattern -AllMatches
         $url = $p.URL
         $results_value = ($results.Matches.Value)
@@ -168,6 +168,7 @@ Function Get-PennyStockNew {
             URL   = $url
         }        
     }
+    $final | Sort-Object -Property Date -Descending
 }
 
 Function Get-RedditDD {
