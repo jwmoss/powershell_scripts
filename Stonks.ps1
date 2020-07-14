@@ -131,6 +131,45 @@ Function Get-PennyStockDD {
     }
 }
 
+Function Get-PennyStockNew {
+    [alias("gpsn")]
+    [CmdletBinding()]
+    param (
+
+    )
+
+    $ps_dd = (Invoke-RestMethod "https://www.reddit.com/r/pennystocks/new/.json").data.children.data |
+    Sort-Object -Property Title 
+    $stockpattern = [regex]::new('[$][A-Za-z][\S]*')
+    #$stockpattern = [regex]::new("^(([a-z]{2,4}):(?![a-z\\d]+\\.))?([a-z]{1,4}|\\d{1,3}(?=\\.)|\\d{4,})(\\.([a-z]{2}))?$")
+
+    foreach ($p in $ps_dd) {
+        $results = $p.title | Select-String $stockpattern -AllMatches
+        $url = $p.URL
+        $results_value = ($results.Matches.Value)
+
+        if ($results_value -like "*:*" -and $results_value -like "*$*") {
+            $ticker = ($results_value -replace ":") -replace "\$"
+        }
+        elseif ($results_value -like "*$*") {
+            $ticker = $results_value -replace "\$"
+        }
+        elseif ($results_value -like "*$*" -and $results_value -like "*)*") {
+            $ticker = ($results_value -replace "\$") -replace ")"
+        }
+        else {
+            $ticker = $results_value
+        }
+
+        [PSCustomObject]@{
+            Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created))
+            Title = $p.title
+            Stock = $ticker
+            URL   = $url
+        }        
+    }
+}
+
 Function Get-RedditDD {
     [alias("grdd")]
     [CmdletBinding()]
