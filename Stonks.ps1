@@ -100,15 +100,15 @@ Function Get-PennyStockDD {
 
     )
 
-    $ps_dd = (Invoke-RestMethod "https://www.reddit.com/r/pennystocks/search/.json?sort=new&restrict_sr=on&q=flair%3ADD").data.children.data |
-    Where-Object { $_.Title -like "*$*" } | Sort-Object -Property Title 
+    $ps_dd = (Invoke-RestMethod "https://www.reddit.com/r/pennystocks/new/.json?&q=flair%3ADD").data.children.data |
+    Sort-Object -Property Title 
     $stockpattern = [regex]::new('[$][A-Za-z][\S]*')
-
+    
     foreach ($p in $ps_dd) {
         $results = $p.title | Select-String $stockpattern -AllMatches
         $url = $p.URL
         $results_value = ($results.Matches.Value)
-
+    
         if ($results_value -like "*:*" -and $results_value -like "*$*") {
             $ticker = ($results_value -replace ":") -replace "\$"
         }
@@ -121,9 +121,9 @@ Function Get-PennyStockDD {
         else {
             $ticker = $results_value
         }
-
+    
         [PSCustomObject]@{
-            Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created))
+            Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created_utc))
             Title = $p.title
             Stock = $ticker
             URL   = $url
@@ -162,7 +162,7 @@ Function Get-PennyStockNew {
         }
 
         [PSCustomObject]@{
-            Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created))
+            Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created_utc))
             Title = $p.title
             Stock = $ticker
             URL   = $url
@@ -179,8 +179,6 @@ Function Get-RedditDD {
         [string]
         $Reddit
     )
-
-
 
     Begin {
 
@@ -226,7 +224,7 @@ Function Get-RedditDD {
             }
 
             [PSCustomObject]@{
-                Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created))
+                Date  = (Get-Date 01.01.1970) + ([System.TimeSpan]::fromseconds($p.created_utc))
                 Title = $p.title
                 Stock = $ticker
                 URL   = $url
