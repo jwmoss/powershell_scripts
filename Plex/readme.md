@@ -3,6 +3,8 @@
 ## Requirements
 
 * A 4K plex library
+  * Tested with Plex Movie Scanner
+  * Tested with Plex Movie Agent
 * The Movie Database v3 API to pull posters
 * Magick version 7.0.10-25 or newer
   * Windows: [chocolatey package](https://chocolatey.org/packages/imagemagick)
