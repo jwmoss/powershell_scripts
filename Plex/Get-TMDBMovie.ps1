@@ -8,13 +8,16 @@ function Get-TMDBMovie {
         $Name,
 
         [string]
-        $IMDBID
+        $IMDBID,
+
+        [string]
+        $API
     )
     
     begin {
         $IRMParams = @{
             Headers     = @{
-                Authorization = ("Bearer {0}") -f $script:tmdbconfig["API"]
+                Authorization = ("Bearer {0}") -f $API
             }
             ContentType = "application/json"
         }
@@ -31,7 +34,7 @@ function Get-TMDBMovie {
                 (Invoke-RestMethod -Uri $URI @IRMParams).Results
             }
             'IMDBID' {
-                $URI = "https://api.themoviedb.org/3/find/{0}?api_key={1}&external_source=imdb_id" -f $IMDBID,$script:tmdbconfig["API"]
+                $URI = "https://api.themoviedb.org/3/find/{0}?api_key={1}&external_source=imdb_id" -f $IMDBID,$API    
                 (Invoke-RestMethod -Uri $URI).movie_results
             }
             Default {

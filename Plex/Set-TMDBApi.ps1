@@ -1,4 +1,4 @@
-function Set-TMDDApi {
+function Set-TMDBApi {
     [CmdletBinding()]
     param (
         [string]
