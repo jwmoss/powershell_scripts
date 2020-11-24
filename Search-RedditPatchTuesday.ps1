@@ -12,7 +12,7 @@ Function Search-RedditPatchTuesday {
     $comments = Invoke-RestMethod "$megathreadUrl.json"
 
     # Iterate through the comments, match any KB#######. Case insensitive, there can be any single character between KB and the numbers.
-    $commentTable = $comments.data.children.data.ForEach{
+    $comments.data.children.data.ForEach{
         $match = ([regex]'(?i)kb\d{7}|(?i)kb.\d{7}').Matches($_.body);
         if ($match.Value) {
             # Return a custom object with the data we want to see
@@ -23,7 +23,4 @@ Function Search-RedditPatchTuesday {
             }
         }
     }
-
-    # Output the data
-    $commentTable
 }
