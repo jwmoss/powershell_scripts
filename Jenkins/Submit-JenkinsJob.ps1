@@ -2,8 +2,8 @@
 function Submit-JenkinsJob {
     [CmdletBinding()]
     param (
-        [string]
-        $Token,
+        [pscredential]
+        $Credential,
 
         [string]
         $Username,
@@ -17,12 +17,9 @@ function Submit-JenkinsJob {
         [string]
         $Name
     )
-
-    $SecurePassword = $token | ConvertTo-SecureString -AsPlainText -Force
-    $Cred = New-Object System.Management.Automation.PSCredential -ArgumentList $Username, $SecurePassword
     $job = @{
         URI        = $JenkinsURL
-        Credential = $Cred
+        Credential = $Credential
         Folder     = $Folder
         Name       = $Name
         Verbose    = $True
