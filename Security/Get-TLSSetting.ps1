@@ -74,6 +74,10 @@ function Get-TLSSetting {
         elseif (($ssl2clientdisabledbydefault -eq 0) -and ($null -eq $ssl2clientenabled)) {
             $ssl2clientenabled_result = "Partial"
         }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($ssl2clientdisabledbydefault -eq 1) -and ($null -eq $ssl2clientenabled)) {
+            $ssl2clientenabled_result = "Partial"
+        }
         else {
             $ssl2clientenabled_result = $True
         }
@@ -94,6 +98,10 @@ function Get-TLSSetting {
         }
         ## If disabled by default is 0, but enabled key is missing, then it's partially applied
         elseif (($ssl2serverdisabledbydefault -eq 0) -and ($null -eq $ssl2serverenabled)) {
+            $ssl2serverenabled_result = "Partial"
+        }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($ssl2serverdisabledbydefault -eq 1) -and ($null -eq $ssl2serverenabled)) {
             $ssl2serverenabled_result = "Partial"
         }
         else {
@@ -118,6 +126,10 @@ function Get-TLSSetting {
         elseif (($ssl3clientdisabledbydefault -eq 0) -and ($null -eq $ssl3clientenabled)) {
             $ssl3clientenabled_result = "Partial"
         }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($ssl3clientdisabledbydefault -eq 1) -and ($null -eq $ssl3clientenabled)) {
+            $ssl3clientenabled_result = "Partial"
+        }
         else {
             $ssl3clientenabled_result = $True
         }
@@ -138,6 +150,10 @@ function Get-TLSSetting {
         }
         ## If disabled by default is 0, but enabled key is missing, then it's partially applied
         elseif (($ssl3serverdisabledbydefault -eq 0) -and ($null -eq $ssl3serverenabled)) {
+            $ssl3serverenabled_result = "Partial"
+        }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($ssl3serverdisabledbydefault -eq 1) -and ($null -eq $ssl3serverenabled)) {
             $ssl3serverenabled_result = "Partial"
         }
         else {
@@ -162,6 +178,10 @@ function Get-TLSSetting {
         elseif (($tls1clientdisabledbydefault -eq 0) -and ($null -eq $tls1clientenabled)) {
             $tls1clientenabled_result = "Partial"
         }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($tls1clientdisabledbydefault -eq 1) -and ($null -eq $tls1clientenabled)) {
+            $tls1clientenabled_result = "Partial"
+        }
         else {
             $tls1clientenabled_result = $True
         }
@@ -182,6 +202,10 @@ function Get-TLSSetting {
         }
         ## If disabled by default is 0, but enabled key is missing, then it's partially applied
         elseif (($tls1serverdisabledbydefault -eq 0) -and ($null -eq $tls1serverenabled)) {
+            $tls1serverenabled_result = "Partial"
+        }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($tls1serverdisabledbydefault -eq 1) -and ($null -eq $tls1serverenabled)) {
             $tls1serverenabled_result = "Partial"
         }
         else {
@@ -206,6 +230,10 @@ function Get-TLSSetting {
         elseif (($tls11clientdisabledbydefault -eq 0) -and ($null -eq $tls11clientenabled)) {
             $tls11serverenabled_result = "Partial"
         }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($tls11clientdisabledbydefault -eq 1) -and ($null -eq $tls11clientenabled)) {
+            $tls1serverenabled_result = "Partial"
+        }
         else {
             $tls11serverenabled_result = $True
         }
@@ -226,6 +254,10 @@ function Get-TLSSetting {
         }
         ## If disabled by default is 0, but enabled key is missing, then it's partially applied
         elseif (($tls11serverdisabledbydefault -eq 0) -and ($null -eq $tls11serverenabled)) {
+            $tls11serverenabled_result = "Partial"
+        }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($tls11serverdisabledbydefault -eq 1) -and ($null -eq $tls11serverenabled)) {
             $tls11serverenabled_result = "Partial"
         }
         else {
@@ -254,6 +286,10 @@ function Get-TLSSetting {
         elseif (($tls12clientdisabledbydefault -eq 0) -and ($tls12clientenabled -eq 1)) {
             $tls12clientenabled_result = "Partial"
         }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($tls12clientdisabledbydefault -eq 1) -and ($null -eq $tls12clientenabled)) {
+            $tls12clientenabled_result = "Partial"
+        }
         else {
             $tls12clientenabled_result = $True
         }
@@ -274,6 +310,10 @@ function Get-TLSSetting {
         }
         ## If enabled is 1, but disabled by default is missing, then it's partially applied
         elseif (($tls12serverdisabledbydefault -eq 0) -and ($tls12serverenabled -eq 1)) {
+            $tls12clientenabled_result = "Partial"
+        }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($tls12serverdisabledbydefault -eq 1) -and ($null -eq $tls12serverenabled)) {
             $tls12clientenabled_result = "Partial"
         }
         else {
@@ -298,6 +338,10 @@ function Get-TLSSetting {
         elseif (($tls13clientdisabledbydefault -eq 0) -and ($tls13clientenabled -eq 1)) {
             $tls13clientenabled_result = "Partial"
         }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($tls13clientdisabledbydefault -eq 1) -and ($null -eq $tls13clientenabled)) {
+            $tls13clientenabled_result = "Partial"
+        }
         else {
             $tls13clientenabled_result = $True
         }
@@ -318,6 +362,10 @@ function Get-TLSSetting {
         }
         ## If enabled is 1, but disabled by default is missing, then it's partially applied
         elseif (($tls13serverdisabledbydefault -eq 0) -and ($tls13serverenabled -eq 1)) {
+            $tls13serverenabled_result = "Partial"
+        }
+        ## If disabled by default is 1, but enabled key is missing, then it's partially applied
+        elseif (($tls13serverdisabledbydefault -eq 1) -and ($null -eq $tls13serverenabled)) {
             $tls13serverenabled_result = "Partial"
         }
         else {
