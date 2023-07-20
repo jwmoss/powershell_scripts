@@ -13,7 +13,5 @@ git clone https://github.com/jwmoss/powershell_scripts.git
 ## Contact me
 
 * Email: jwmoss88@gmail.com
-* Twitter: [@jwmoss](https://www.twitter.com/jwmoss)
-* Blog: [Link](https://jwmoss.github.io/)
 
 Pull requests welcome!
